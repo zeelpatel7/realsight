@@ -1,13 +1,10 @@
-import yt_dlp
 import os
+from yt_dlp import YoutubeDL
 
 def download_youtube_video(url, save_path="data"):
     try:
-        print(f"[INFO] Starting download for {url}")
-
         ydl_opts = {
             'format': 'bestvideo+bestaudio/best',
-            'outtmpl': f'{save_path}/%(id)s.%(ext)s',
             'writeinfojson': True,
             'writedescription': True,
             'writeautomaticsub': True,
@@ -15,28 +12,30 @@ def download_youtube_video(url, save_path="data"):
             'subtitleslangs': ['en'],
             'quiet': False,
             'ffmpeg_location': 'C:\\Program Files\\ffmpeg\\ffmpeg-7.1.1-essentials_build\\bin',
-            'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                'Accept-Language': 'en-US,en;q=0.9',
-            }
+            'outtmpl': f'{save_path}/%(id)s/%(id)s.%(ext)s'
         }
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=True)
+        with YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
 
-        video_id = info_dict.get("id")
-        title = info_dict.get("title")
-        description = info_dict.get("description")
-        channel = info_dict.get("uploader")
+        video_id = info.get("id", "unknown")
+        title = info.get("title", "unknown")
+        channel = info.get("channel", "unknown")
 
-        print(f"[INFO] Download complete for video: {title}")
+        video_filename = f"{video_id}.{info.get('ext', 'webm')}"
+        video_path = os.path.join(save_path, video_id, video_filename)
+        transcript_path = os.path.join(save_path, video_id, f"{video_id}.en.vtt")
+        metadata_path = os.path.join(save_path, video_id, f"{video_id}.info.json")
+        description_path = os.path.join(save_path, video_id, f"{video_id}.description")
 
         return {
             "video_id": video_id,
             "title": title,
-            "description": description,
             "channel": channel,
-            "video_path": os.path.join(save_path, f"{video_id}.mp4")
+            "video_path": video_path,
+            "transcript_path": transcript_path,
+            "metadata_path": metadata_path,
+            "description_path": description_path
         }
 
     except Exception as e:
