@@ -1,0 +1,12 @@
+ffmpeg-python
+openai-whisper
+torch
+numpy
+pandas
+scikit-learn
+matplotlib
+pymc3
+transformers
+nltk
+tqdm
+yt-dlp
